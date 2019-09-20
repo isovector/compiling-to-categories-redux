@@ -6,5 +6,5 @@ import Test
 import Control.Arrow
 
 main :: IO ()
-main = print $ test 5
+main = print $ foo 5
 

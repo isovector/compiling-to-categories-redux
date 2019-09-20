@@ -24,6 +24,7 @@ dependencies:
 - ghc
 - syb
 - categories
+- containers
 
 library:
   source-dirs: src
