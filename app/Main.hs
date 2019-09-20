@@ -6,4 +6,5 @@ import Test
 import Control.Arrow
 
 main :: IO ()
-main = print $ runKleisli @Maybe test 5
+main = print $ test 5
+

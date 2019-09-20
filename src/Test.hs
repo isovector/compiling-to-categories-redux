@@ -1,10 +1,11 @@
-{-# OPTIONS_GHC -fplugin=Lib #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# OPTIONS_GHC -fplugin=Lib  #-}
 
 module Test where
 
 import CCC
-import Control.Category
+import Prelude hiding (id)
 
-test :: Category k => k Int Int
-test = toCCC (\i -> i)
+test :: (ConstCat k n, Num n, Category k) => k a n
+test = toCCC (\i -> 5)
 
