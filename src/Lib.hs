@@ -6,6 +6,7 @@
 
 module Lib where
 
+import HsPat
 import Plugins
 import GhcPlugins
 import TcRnTypes
@@ -28,14 +29,28 @@ ourPluginImpl
     -> HsGroup GhcRn
     -> TcM (TcGblEnv, HsGroup GhcRn)
 ourPluginImpl _ gbl_env grp = do
-  toCCCName <- lookupGlobalOccRn $ Unqual (mkVarOcc "toCCC")
-  -- pprPanic "hi" $ ppr toCCCName
+  toCCCName <- lookupGlobalOccRn $ Qual (mkModuleName "CCC") (mkVarOcc "toCCC")
+  id' <- lookupGlobalOccRn $ Qual (mkModuleName "Control.Category") (mkVarOcc "id")
   let ?toCCC = toCCCName
-  -- pprPanic "uh oh" $ showAstData BlankSrcSpan $ hs_valds grp
-  pprPanic "uh oh" $ ppr $ listify (\case
-    ToCCC lambda -> True
-    _ -> False) grp
-    -- -- BlankSrcSpan grp
+      ?id = id'
+
+  let grp' = everywhere (mkT rewrite) grp
+  pure (gbl_env, grp')
+
+--   pprPanic "force it" $ ppr grp'
+--   -- pprPanic "uh oh" $ ppr $ flip listify grp $ \case
+--   --   ToCCC lambda -> True
+--   --   _            -> False
+
+
+rewrite :: (?toCCC :: Name, ?id :: Name) => HsExpr GhcRn -> HsExpr GhcRn
+rewrite (ToCCC (Lambda var (HsVar _ (L _ name)))) | var == name = HsVar noExt $ noLoc ?id
+rewrite a = a
+
+
+pattern Lambda :: Name -> HsExpr GhcRn -> HsExpr GhcRn
+pattern Lambda var body <- HsLam _ (MG _ (L _ [L _ (Match _ _ [L _ (VarPat _ (L _ var))] (GRHSs _ [L _ (GRHS _ [] (L _ body))] _))]) _)
+
 
 pattern ToCCC :: (?toCCC :: Name) => HsExpr GhcRn -> HsExpr GhcRn
 pattern ToCCC lambda

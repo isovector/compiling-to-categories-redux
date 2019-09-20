@@ -3,7 +3,8 @@
 module Test where
 
 import CCC
+import Control.Category
 
-foo :: Int -> Bool
-foo = toCCC (\i -> i == 0)
+test :: Category k => k Int Int
+test = toCCC (\i -> i)
 

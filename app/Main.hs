@@ -1,6 +1,9 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Main where
 
-import Lib
+import Test
+import Control.Arrow
 
 main :: IO ()
-main = someFunc
+main = print $ runKleisli @Maybe test 5
